@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "famicons_footsteps.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
