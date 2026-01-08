@@ -5,7 +5,7 @@ xcodebuild clean
 xcodebuild \
   -scheme StepCounter \
   -project StepCounter.xcodeproj \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.1' \
   -enableCodeCoverage YES \
   -parallel-testing-enabled NO \
   test
