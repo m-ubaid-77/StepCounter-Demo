@@ -1,0 +1,44 @@
+# .swiftlint.yml
+
+# Disable rules you don't want
+disabled_rules:
+  - todo
+
+# Include specific folders (optional)
+included:
+  - StepCounter
+
+# Exclude folders like Pods, etc.
+excluded:
+  - Carthage
+  - Pods
+
+# Enable optional rules
+opt_in_rules:
+  - empty_count
+  - missing_docs
+  
+analyzer_rules:
+  - unused_import
+
+# Customize some rule thresholds
+line_length:
+  warning: 120
+  error: 200
+
+trailing_whitespace:
+  ignores_empty_lines: true
+  
+vertical_whitespace:
+  severity: warning
+  
+identifier_name:
+  min_length: 3 # keep normal enforcement
+  excluded: # allow exceptions
+    - h3
+    - h4
+    - h6
+    - id
+
+
+

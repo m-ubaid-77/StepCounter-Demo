@@ -16,11 +16,9 @@ final class UITestsAppAssembly: Assembly {
             let permission = UITestConfig.motionSensorPermission
             if permission == "denied" {
                 state = .denied
-            }
-            else if permission == "notDetermined" {
+            } else if permission == "notDetermined" {
                 state = .notDetermined
-            }
-            else if permission == "authorized" {
+            } else if permission == "authorized" {
                 state = .authorized
             }
             return FakeMotionPermissionProvider(state: state)

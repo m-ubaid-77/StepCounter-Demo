@@ -9,7 +9,6 @@ import SwiftUI
 @main
 struct StepCounterApp: App {
     @StateObject var router = AppDIContainer.shared.resolve(Router.self)
-    let persistenceController = PersistenceController.shared
     init() {
         UIView.appearance().overrideUserInterfaceStyle = .light
     }

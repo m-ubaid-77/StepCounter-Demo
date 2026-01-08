@@ -56,7 +56,6 @@ struct MotionPermissionScreen: View {
     }
 }
 
-
 #Preview {
     MotionPermissionScreen(viewModel: AppDIContainer.shared.resolve(MotionPermissionViewModel.self))
 }

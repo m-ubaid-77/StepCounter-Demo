@@ -20,8 +20,7 @@ final class FakeMotionPermissionProvider: MotionPermissionProviderProtocol {
     func requestPermission() async -> AppPermissionState {
         if UITestConfig.motionSensorPermission == "notDetermined" {
             state = .authorized
-        }
-        else if UITestConfig.motionSensorPermission == "denied" {
+        } else if UITestConfig.motionSensorPermission == "denied" {
             state = .denied
         }
         return state

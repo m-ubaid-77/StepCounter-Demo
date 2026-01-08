@@ -107,6 +107,7 @@
 				52B3F48D2EF7DEB300A306D6 /* Sources */,
 				52B3F48E2EF7DEB300A306D6 /* Frameworks */,
 				52B3F48F2EF7DEB300A306D6 /* Resources */,
+				52BD62262F0F8FEA0098059C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -239,6 +240,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		52BD62262F0F8FEA0098059C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"🔍 Running SwiftLint from full path...\"\necho \"CONFIGURATION=$CONFIGURATION\"\necho \"SRCROOT=$SRCROOT\"\n# Only run SwiftLint for non-Release builds (e.g., Debug, Staging)\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n  if [ -f \"${SRCROOT}/.swiftlint.yml\" ]; then\n    /opt/homebrew/bin/swiftlint lint --config \"${SRCROOT}/.swiftlint.yml\" --reporter xcode\n  else\n    echo \"⚠️ .swiftlint.yml not found at ${SRCROOT}/.swiftlint.yml\"\n  fi\nelse\n  echo \"ℹ️ Skipping SwiftLint for Release (Archive) build.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		52B3F48D2EF7DEB300A306D6 /* Sources */ = {
@@ -408,6 +430,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CXZH9EV98N;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "We need access to your motion data to track your daily steps and activity.";
@@ -442,6 +465,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CXZH9EV98N;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "We need access to your motion data to track your daily steps and activity.";
