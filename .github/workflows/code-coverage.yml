@@ -1,0 +1,62 @@
+name: Code Coverage
+
+on:
+  pull_request:
+    branches: ['**']
+  
+jobs:
+  code-coverage:
+    name: Generate Code Coverage Report
+    runs-on: macos-15
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.1.1'
+      
+      - name: Install SwiftLint
+        run: |
+          if ! command -v swiftlint &> /dev/null; then
+            echo "SwiftLint not found, installing via Homebrew..."
+            brew install swiftlint
+          else
+            echo "SwiftLint already installed"
+          fi
+      
+      - name: Run Coverage Script
+        id: coverage
+        run: |
+          chmod +x ./CodeCov.sh
+          ./CodeCov.sh > coverage_output.txt 2>&1
+          
+          # Extract coverage percentage (changed from $4 to $5)
+          COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          
+          # Show output for debugging
+          cat coverage_output.txt
+      
+      - name: Comment Coverage on PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const coverage = '${{ steps.coverage.outputs.coverage }}';
+            
+            const body = `## 📊 Code Coverage Report
+            
+            **Coverage**: ${coverage}
+            **Branch**: \`${{ github.head_ref }}\`
+            **Commit**: \`${{ github.sha }}\``;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
