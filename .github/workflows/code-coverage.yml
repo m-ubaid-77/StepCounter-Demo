@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: ['**']
 
+permissions:
+  contents: read
+  issues: write
+  
 jobs:
   code-coverage:
     name: Generate Code Coverage Report
