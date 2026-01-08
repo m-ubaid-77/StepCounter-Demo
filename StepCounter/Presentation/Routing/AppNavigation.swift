@@ -45,7 +45,6 @@ struct AppNavigation: View {
     }
 }
 
-
 final class Router: ObservableObject, RouterProtocol {
     @Published var path: [Route] = []
     @Published var root: Route = .splash // root view

@@ -35,7 +35,6 @@ final class AppDIContainer {
     }
 }
 
-
 extension Resolver {
     func resolveRequired<Service>(_ serviceType: Service.Type) -> Service {
         guard let service = self.resolve(serviceType) else {

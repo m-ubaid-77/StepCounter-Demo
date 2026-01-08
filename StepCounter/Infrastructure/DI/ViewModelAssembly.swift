@@ -24,7 +24,7 @@ final class ViewModelAssembly: Assembly {
         
         container.register(RootCoordinatorViewModel.self) { resolver in
             RootCoordinatorViewModel(
-                checkPermission: AppDIContainer.shared.resolve(CheckMotionPermissionUseCase.self)
+                checkPermission: resolver.resolveRequired(CheckMotionPermissionUseCase.self)
             )
         }
     }

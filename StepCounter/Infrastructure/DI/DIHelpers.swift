@@ -23,7 +23,6 @@ extension ProcessInfo {
     }
 }
 
-
 struct UITestConfig {
     static let isUITest = CommandLine.arguments.contains("--ui-testing")
     static let motionSensorPermission = ProcessInfo.processInfo.environment["motion-sensor-permission"]
