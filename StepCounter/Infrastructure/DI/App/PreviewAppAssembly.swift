@@ -7,7 +7,7 @@
 
 import Swinject
 
-final class PreviewAppAssembly: Assembly {
+final class PreviewAppAssembly: Assembl {
     func assemble(container: Container) {
         container.register(MotionPermissionProviderProtocol.self) { _ in
             FakeMotionPermissionProvider(state: .authorized)
