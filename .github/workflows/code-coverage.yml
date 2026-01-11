@@ -1,58 +1,34 @@
-name: Code Coverage
-
-on:
-  pull_request:
-    branches: ['**']
-  
-jobs:
-  code-coverage:
-    name: Generate Code Coverage Report
-    runs-on: macos-15
-    permissions:
-      pull-requests: write
-      contents: read
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.1.1'
-      
-      - name: Install SwiftLint
-        run: |
-          if ! command -v swiftlint &> /dev/null; then
-            echo "SwiftLint not found, installing via Homebrew..."
-            brew install swiftlint
-          else
-            echo "SwiftLint already installed"
-          fi
-      
-      - name: Run Coverage Script
+- name: Run Coverage Script
         id: coverage
+        continue-on-error: true  # Prevents the workflow from stopping immediately
         run: |
           chmod +x ./CodeCov.sh
           ./CodeCov.sh > coverage_output.txt 2>&1
           
-          # Extract coverage percentage (changed from $4 to $5)
-          COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
-          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          # Check if the build failed in the logs
+          if grep -q "❌ BUILD_FAILED" coverage_output.txt; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+          else
+            COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
           
-          # Show output for debugging
           cat coverage_output.txt
-      
-      - name: Comment Coverage on PR
+
+      - name: Comment on PR
         uses: actions/github-script@v6
         with:
           script: |
+            const status = '${{ steps.coverage.outputs.status }}';
             const coverage = '${{ steps.coverage.outputs.coverage }}';
             
-            const body = `## 📊 Code Coverage Report
-            
-            **Coverage**: ${coverage}
-            **Branch**: \`${{ github.head_ref }}\`
-            **Commit**: \`${{ github.sha }}\``;
+            let body = '';
+            if (status === 'success') {
+              body = `## 📊 Code Coverage Report\n\n**Coverage**: ${coverage}\n**Status**: ✅ Passed`;
+            } else {
+              body = `## ❌ Build Failed\n\nThe test suite failed to execute. Please check the [GitHub Actions logs](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}) for details.`;
+            }
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -60,3 +36,7 @@ jobs:
               repo: context.repo.repo,
               body: body
             });
+
+      - name: Fail Workflow if Build Failed
+        if: steps.coverage.outputs.status == 'failed'
+        run: exit 1
