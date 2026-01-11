@@ -1,20 +1,41 @@
-- name: Run Coverage Script
+name: Code Coverage
+
+on:
+  pull_request:
+    branches: ['**']
+
+jobs:
+  code-coverage:
+    name: Generate Code Coverage Report
+    runs-on: macos-15
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.1' # Adjust to your required version
+
+      - name: Run Coverage Script
         id: coverage
-        continue-on-error: true  # Prevents the workflow from stopping immediately
+        continue-on-error: true
         run: |
           chmod +x ./CodeCov.sh
-          ./CodeCov.sh > coverage_output.txt 2>&1
+          # Capture output to a file and the console simultaneously
+          ./CodeCov.sh 2>&1 | tee coverage_output.txt
           
-          # Check if the build failed in the logs
           if grep -q "❌ BUILD_FAILED" coverage_output.txt; then
             echo "status=failed" >> $GITHUB_OUTPUT
           else
-            COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
-            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            # Extract the percentage value (e.g., 85.5%)
+            COVERAGE_VAL=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $4}')
+            echo "coverage=$COVERAGE_VAL" >> $GITHUB_OUTPUT
             echo "status=success" >> $GITHUB_OUTPUT
           fi
-          
-          cat coverage_output.txt
 
       - name: Comment on PR
         uses: actions/github-script@v6
@@ -22,12 +43,18 @@
           script: |
             const status = '${{ steps.coverage.outputs.status }}';
             const coverage = '${{ steps.coverage.outputs.coverage }}';
+            const runId = context.runId;
             
             let body = '';
             if (status === 'success') {
-              body = `## 📊 Code Coverage Report\n\n**Coverage**: ${coverage}\n**Status**: ✅ Passed`;
+              body = `## 📊 Code Coverage Report\n\n` +
+                     `**Coverage**: \`${coverage}\` ✅\n` +
+                     `**Branch**: \`${{ github.head_ref }}\`\n` +
+                     `**Commit**: ${{ github.sha }}`;
             } else {
-              body = `## ❌ Build Failed\n\nThe test suite failed to execute. Please check the [GitHub Actions logs](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}) for details.`;
+              body = `## ❌ Build Failed\n\n` +
+                     `The test suite failed to execute correctly. Please review the logs to identify the issue.\n\n` +
+                     `[🔍 View Action Logs](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId})`;
             }
             
             github.rest.issues.createComment({
@@ -37,6 +64,8 @@
               body: body
             });
 
-      - name: Fail Workflow if Build Failed
+      - name: Terminate if build failed
         if: steps.coverage.outputs.status == 'failed'
-        run: exit 1
+        run: |
+          echo "Failing workflow because the build/test step failed."
+          exit 1
