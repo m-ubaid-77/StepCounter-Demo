@@ -1,27 +1,30 @@
 #!/bin/bash
 
-# Ensure the script exits if any command fails
+# Ensure script exits with error if xcodebuild fails
 set -o pipefail
 
-echo "Starting tests..."
+echo "🧹 Cleaning previous builds..."
+xcodebuild clean -project StepCounter.xcodeproj -scheme StepCounter > /dev/null
 
-# Run tests
-xcodebuild clean
+echo "🚀 Running tests for StepCounter..."
 
-if xcodebuild \
+# Run xcodebuild and capture the exit code
+xcodebuild \
   -scheme StepCounter \
   -project StepCounter.xcodeproj \
   -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.1' \
   -enableCodeCoverage YES \
   -parallel-testing-enabled NO \
-  test; then
-    
-    # SUCCESS PATH
+  test
+
+if [ $? -eq 0 ]; then
+    # Get latest xcresult
     XCRESULT_PATH=$(find ~/Library/Developer/Xcode/DerivedData \
       -type d -name "*.xcresult" \
       -exec stat -f "%m %N" {} \; \
       | sort -rn | head -n 1 | cut -d' ' -f2-)
 
+    # Extract coverage
     APP_COVERAGE=$(xcrun xccov view --report "$XCRESULT_PATH" \
       | grep "StepCounter.app" \
       | head -n 1 \
@@ -29,7 +32,6 @@ if xcodebuild \
 
     echo "📈 App Test Coverage: $APP_COVERAGE"
 else
-    # FAILURE PATH
     echo "❌ BUILD_FAILED"
     exit 1
 fi
