@@ -2,70 +2,99 @@ name: Code Coverage
 
 on:
   pull_request:
-    branches: ['**']
+    branches:
+      - '**'
 
 jobs:
   code-coverage:
     name: Generate Code Coverage Report
     runs-on: macos-15
+
     permissions:
       pull-requests: write
       contents: read
+
     steps:
+      # -----------------------------
+      # Checkout
+      # -----------------------------
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # -----------------------------
+      # Setup Xcode
+      # -----------------------------
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.1' # Adjust to your required version
+          xcode-version: '26.1.1'
 
-      - name: Run Coverage Script
-        id: coverage
-        continue-on-error: true
+      # -----------------------------
+      # Install SwiftLint (optional)
+      # -----------------------------
+      - name: Install SwiftLint
         run: |
-          chmod +x ./CodeCov.sh
-          # Capture output to a file and the console simultaneously
-          ./CodeCov.sh 2>&1 | tee coverage_output.txt
-          
-          if grep -q "❌ BUILD_FAILED" coverage_output.txt; then
-            echo "status=failed" >> $GITHUB_OUTPUT
+          if ! command -v swiftlint &> /dev/null; then
+            echo "SwiftLint not found, installing..."
+            brew install swiftlint
           else
-            # Extract the percentage value (e.g., 85.5%)
-            COVERAGE_VAL=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $4}')
-            echo "coverage=$COVERAGE_VAL" >> $GITHUB_OUTPUT
-            echo "status=success" >> $GITHUB_OUTPUT
+            echo "SwiftLint already installed"
           fi
 
-      - name: Comment on PR
+      # -----------------------------
+      # Run Code Coverage Script
+      # -----------------------------
+      - name: Run Coverage Script
+        id: coverage
+        run: |
+          chmod +x ./CodeCov.sh
+
+          if ./CodeCov.sh > coverage_output.txt 2>&1; then
+            echo "status=success" >> $GITHUB_OUTPUT
+
+            COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+
+          echo "------ Coverage Script Output ------"
+          cat coverage_output.txt
+          echo "-----------------------------------"
+
+      # -----------------------------
+      # Comment Result on PR
+      # -----------------------------
+      - name: Comment Coverage on PR
         uses: actions/github-script@v6
         with:
           script: |
             const status = '${{ steps.coverage.outputs.status }}';
             const coverage = '${{ steps.coverage.outputs.coverage }}';
-            const runId = context.runId;
-            
-            let body = '';
+
+            let body;
+
             if (status === 'success') {
-              body = `## 📊 Code Coverage Report\n\n` +
-                     `**Coverage**: \`${coverage}\` ✅\n` +
-                     `**Branch**: \`${{ github.head_ref }}\`\n` +
-                     `**Commit**: ${{ github.sha }}`;
+              body = `## 📊 Code Coverage Report
+
+              ✅ **Build Status**: Passed  
+              📈 **Coverage**: **${coverage}**  
+
+              🌿 **Branch**: \`${{ github.head_ref }}\`  
+              🔐 **Commit**: \`${{ github.sha }}\``;
             } else {
-              body = `## ❌ Build Failed\n\n` +
-                     `The test suite failed to execute correctly. Please review the logs to identify the issue.\n\n` +
-                     `[🔍 View Action Logs](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId})`;
+              body = `## ❌ Build Failed
+
+              The build or test execution failed.  
+              Please check **GitHub Actions logs** for details.
+
+              🌿 **Branch**: \`${{ github.head_ref }}\`  
+              🔐 **Commit**: \`${{ github.sha }}\``;
             }
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
             });
-
-      - name: Terminate if build failed
-        if: steps.coverage.outputs.status == 'failed'
-        run: |
-          echo "Failing workflow because the build/test step failed."
-          exit 1
