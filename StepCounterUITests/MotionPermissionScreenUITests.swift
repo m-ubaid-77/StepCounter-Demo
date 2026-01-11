@@ -38,7 +38,7 @@ final class MotionPermissionScreenUITests: XCTestCase {
 
         allowButton.tap()
 
-        let mainScreenLabel = app.staticTexts["Today's Activity"]
+        let mainScreenLabel = app.staticTexts["Today's Activit"]
         XCTAssertTrue(mainScreenLabel.waitForExistence(timeout: 3.0))
     }
 
