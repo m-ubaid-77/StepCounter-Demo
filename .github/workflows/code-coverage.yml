@@ -98,3 +98,12 @@ jobs:
               repo: context.repo.repo,
               body: body
             });
+
+      # -------------------------------------------------
+      # Fail workflow if build/test failed
+      # -------------------------------------------------
+      - name: Fail workflow if build failed
+        if: steps.coverage.outputs.status == 'failure'
+        run: |
+          echo "❌ Marking GitHub Action as failed"
+          exit 1
