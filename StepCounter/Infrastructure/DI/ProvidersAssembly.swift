@@ -6,7 +6,7 @@
 //
 import Swinject
 
-final class ProvidersAssembly: Assembly {
+final class ProvidersAssembly: Assembl {
     func assemble(container: Container) {
         container.register(MotionPermissionProviderProtocol.self) { _ in
             MotionPermissionProvider()
