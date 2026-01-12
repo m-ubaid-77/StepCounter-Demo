@@ -39,9 +39,9 @@ The app follows Clean Architecture principles with three main layers:
 
 ## 🛠️ Requirements
 
-- iOS 15.0+
-- Xcode 13.0+
-- Swift 5.5+
+- iOS 16.4+
+- Xcode 16.0+
+- Swift 6.0+
 - [SwiftLint](https://github.com/realm/SwiftLint) (for code style enforcement)
 
 ## 🚀 Getting Started
@@ -100,14 +100,6 @@ The project includes both unit tests and UI tests to ensure code quality and fun
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📱 Screenshots
-
-*Screenshots will be added soon*
-
 ## 📚 Resources
 
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
@@ -116,6 +108,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📬 Contact
 
-Muhammad Ubaid - [@yourtwitter](https://twitter.com/yourtwitter)
+Muhammad Ubaid - [@LinkedIn](https://www.linkedin.com/in/muhammadubaid77/)
 
-Project Link: [https://github.com/yourusername/StepCounter-Demo](https://github.com/yourusername/StepCounter-Demo)
+Project Link: [https://github.com/m-ubaid-77/StepCounter-Demo](https://github.com/m-ubaid-77/StepCounter-Demo)
