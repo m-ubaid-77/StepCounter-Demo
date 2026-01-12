@@ -33,6 +33,27 @@
 		52B3F4AD2EF7DEB400A306D6 /* StepCounterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StepCounterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		52A095202F14D1F400E9A51A /* Exceptions for "StepCounterTests" folder in "StepCounter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockMotionPermissionProvider.swift,
+				Mocks/MockPedometerRepository.swift,
+				Mocks/MockRouter.swift,
+			);
+			target = 52B3F4902EF7DEB300A306D6 /* StepCounter */;
+		};
+		52A095212F14D1F400E9A51A /* Exceptions for "StepCounterTests" folder in "StepCounterTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockMotionPermissionProvider.swift,
+				Mocks/MockPedometerRepository.swift,
+				Mocks/MockRouter.swift,
+			);
+			target = 52B3F4A22EF7DEB400A306D6 /* StepCounterTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		52B3F4932EF7DEB300A306D6 /* StepCounter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -41,6 +62,10 @@
 		};
 		52B3F4A62EF7DEB400A306D6 /* StepCounterTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				52A095202F14D1F400E9A51A /* Exceptions for "StepCounterTests" folder in "StepCounter" target */,
+				52A095212F14D1F400E9A51A /* Exceptions for "StepCounterTests" folder in "StepCounterTests" target */,
+			);
 			path = StepCounterTests;
 			sourceTree = "<group>";
 		};

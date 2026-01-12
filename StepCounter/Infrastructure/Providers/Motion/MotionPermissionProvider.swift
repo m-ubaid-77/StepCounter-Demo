@@ -21,17 +21,17 @@ final class MotionPermissionProvider: MotionPermissionProviderProtocol {
     }
     
     func requestPermission() async -> AppPermissionState {
-            await withCheckedContinuation { continuation in
-                let now = Date()
-                pedometer.queryPedometerData(from: now, to: now) { _, error in
-                    let state: AppPermissionState
-                    if let error = error as NSError?, error.code == Int(CMErrorMotionActivityNotAuthorized.rawValue) {
-                        state = .denied
-                    } else {
-                        state = self.checkStatus()
-                    }
-                    continuation.resume(returning: state)
+        await withCheckedContinuation { continuation in
+            let now = Date()
+            pedometer.queryPedometerData(from: now, to: now) { _, error in
+                let state: AppPermissionState
+                if let error = error as NSError?, error.code == Int(CMErrorMotionActivityNotAuthorized.rawValue) {
+                    state = .denied
+                } else {
+                    state = self.checkStatus()
                 }
+                continuation.resume(returning: state)
             }
         }
+    }
 }
