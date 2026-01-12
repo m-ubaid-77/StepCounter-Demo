@@ -8,18 +8,24 @@
 import Combine
 
 final class MockPedometerRepository: PedometerRepositoryProtocol {
-    
+
     private let stepsSubject = CurrentValueSubject<Int, Never>(0)
-    
+
+    private(set) var startCalled = false
+    private(set) var stopCalled = false
+
     var stepsPublisher: AnyPublisher<Int, Never> {
         stepsSubject.eraseToAnyPublisher()
     }
-    
-    // Start/stop do nothing (controlled manually)
-    func start() {}
-    func stop() {}
-    
-    // Programmatically set steps in tests
+
+    func start() {
+        startCalled = true
+    }
+
+    func stop() {
+        stopCalled = true
+    }
+
     func setSteps(_ steps: Int) {
         stepsSubject.send(steps)
     }

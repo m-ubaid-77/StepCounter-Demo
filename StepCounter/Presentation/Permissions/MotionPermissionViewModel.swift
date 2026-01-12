@@ -12,11 +12,11 @@ class MotionPermissionViewModel: ObservableObject {
     
     private let requestPermissionUseCase: RequestMotionSensorPermissionUseCase
     private let checkPermissionUseCase: CheckMotionPermissionUseCase
-    private let router: Router
+    private let router: RouterProtocol
     
     init(requestPermissionUseCase: RequestMotionSensorPermissionUseCase,
          checkPermissionUseCase: CheckMotionPermissionUseCase,
-         router: Router
+         router: RouterProtocol
     ) {
         self.requestPermissionUseCase = requestPermissionUseCase
         self.checkPermissionUseCase = checkPermissionUseCase

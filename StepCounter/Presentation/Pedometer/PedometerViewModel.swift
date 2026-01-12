@@ -18,8 +18,10 @@ class PedometerViewModel: ObservableObject {
         self.repository = repository
         
         repository.stepsPublisher
-            .receive(on: DispatchQueue.main)
-            .assign(to: &$steps)
+            .sink { [weak self] steps in
+                self?.steps = steps
+            }
+            .store(in: &cancellables)
     }
     
     func start() {
