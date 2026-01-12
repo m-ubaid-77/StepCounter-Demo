@@ -2,61 +2,108 @@ name: Code Coverage
 
 on:
   pull_request:
-    branches: ['**']
-  
+    branches:
+      - '**'
+
 jobs:
   code-coverage:
     name: Generate Code Coverage Report
     runs-on: macos-15
+
     permissions:
       pull-requests: write
       contents: read
+
     steps:
+      # -----------------------------
+      # Checkout
+      # -----------------------------
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
+
+      # -----------------------------
+      # Setup Xcode
+      # -----------------------------
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26.1.1'
-      
+
+      # -----------------------------
+      # Install SwiftLint (optional)
+      # -----------------------------
       - name: Install SwiftLint
         run: |
           if ! command -v swiftlint &> /dev/null; then
-            echo "SwiftLint not found, installing via Homebrew..."
+            echo "SwiftLint not found, installing..."
             brew install swiftlint
           else
             echo "SwiftLint already installed"
           fi
-      
+
+      # -----------------------------
+      # Run Code Coverage Script
+      # -----------------------------
       - name: Run Coverage Script
         id: coverage
         run: |
           chmod +x ./CodeCov.sh
-          ./CodeCov.sh > coverage_output.txt 2>&1
-          
-          # Extract coverage percentage (changed from $4 to $5)
-          COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
-          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
-          
-          # Show output for debugging
+
+          if ./CodeCov.sh > coverage_output.txt 2>&1; then
+            echo "status=success" >> $GITHUB_OUTPUT
+
+            COVERAGE=$(grep "📈 App Test Coverage:" coverage_output.txt | awk '{print $5}')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+
+          echo "------ Coverage Script Output ------"
           cat coverage_output.txt
-      
+          echo "-----------------------------------"
+
+      # -----------------------------
+      # Comment Result on PR
+      # -----------------------------
       - name: Comment Coverage on PR
         uses: actions/github-script@v6
         with:
           script: |
+            const status = '${{ steps.coverage.outputs.status }}';
             const coverage = '${{ steps.coverage.outputs.coverage }}';
-            
-            const body = `## 📊 Code Coverage Report
-            
-            **Coverage**: ${coverage}
-            **Branch**: \`${{ github.head_ref }}\`
-            **Commit**: \`${{ github.sha }}\``;
-            
+
+            let body;
+
+            if (status === 'success') {
+              body = `## 📊 Code Coverage Report
+
+              ✅ **Build Status**: Passed  
+              📈 **Coverage**: **${coverage}**  
+
+              🌿 **Branch**: \`${{ github.head_ref }}\`  
+              🔐 **Commit**: \`${{ github.sha }}\``;
+            } else {
+              body = `## ❌ Build Failed
+
+              The build or test execution failed.  
+              Please check **GitHub Actions logs** for details.
+
+              🌿 **Branch**: \`${{ github.head_ref }}\`  
+              🔐 **Commit**: \`${{ github.sha }}\``;
+            }
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
             });
+
+      # -------------------------------------------------
+      # Fail workflow if build/test failed
+      # -------------------------------------------------
+      - name: Fail workflow if build failed
+        if: steps.coverage.outputs.status == 'failure'
+        run: |
+          echo "❌ Marking GitHub Action as failed"
+          exit 1
