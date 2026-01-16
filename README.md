@@ -109,5 +109,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📬 Contact
 
 Muhammad Ubaid - [@LinkedIn](https://www.linkedin.com/in/muhammadubaid77/)
-
-Project Link: [https://github.com/m-ubaid-77/StepCounter-Demo](https://github.com/m-ubaid-77/StepCounter-Demo)
